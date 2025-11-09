@@ -165,7 +165,7 @@ function App() {
             SQUASH
           </h1>
           <h2 className="neon-text-pink relative z-10 text-3xl font-bold tracking-widest text-pink-500 md:text-5xl">
-            TRACKER 2084
+            UNLIMITED 2025 - 2026
           </h2>
           <div className="animate-pulse-glow relative z-10 mt-4 text-sm tracking-[0.3em] text-cyan-400">
             ▸ GAME ON ◂
