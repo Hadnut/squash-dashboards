@@ -6,6 +6,7 @@ import { MatchDayList } from "./components/MatchDayList";
 import { Leaderboard } from "./components/Leaderboard";
 import { Dashboard } from "./components/Dashboard";
 import { RecentMatches } from "./components/RecentMatches";
+import { PongAnimation } from "./components/PongAnimation";
 
 function App() {
   const [matches, setMatches] = useState<Match[]>(() => {
@@ -155,6 +156,10 @@ function App() {
 
       <div className="container relative z-10 mx-auto px-4 py-8">
         <header className="animate-slide-down relative mb-12 text-center">
+          <div className="absolute inset-0 overflow-hidden">
+            <PongAnimation />
+          </div>
+          
           <div className="laser-container">
             <div className="laser-beam laser-beam-1"></div>
             <div className="laser-beam laser-beam-2"></div>
@@ -167,6 +172,7 @@ function App() {
           <h2 className="neon-text-pink relative z-10 text-3xl font-bold tracking-widest text-pink-500 md:text-5xl">
             UNLIMITED 2025 - 2026
           </h2>
+          
           <div className="animate-pulse-glow relative z-10 mt-4 text-sm tracking-[0.3em] text-cyan-400">
             ▸ GAME ON ◂
           </div>
