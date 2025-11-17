@@ -7,6 +7,7 @@ import { Leaderboard } from "./components/Leaderboard";
 import { Dashboard } from "./components/Dashboard";
 import { RecentMatches } from "./components/RecentMatches";
 import { PongAnimation } from "./components/PongAnimation";
+import { PlayerManagement } from "./components/PlayerManagement";
 import {
   fetchMatches,
   fetchMatchDays,
@@ -30,6 +31,7 @@ function App() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<"dashboard" | "players">("dashboard");
 
   // Load initial data from Supabase
   useEffect(() => {
@@ -291,33 +293,64 @@ function App() {
           )}
         </header>
 
-        <Dashboard players={players} matches={filteredMatches} />
-
-        <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <MatchDayForm
-            onAddMatchDay={handleAddMatchDay}
-            matchDays={matchDays}
-          />
-          <MatchDayList
-            matchDays={matchDays}
-            currentMatchDayId={currentMatchDayId}
-            onSelectMatchDay={handleSelectMatchDay}
-            onDeleteMatchDay={handleDeleteMatchDay}
-          />
-          <MatchForm
-            onAddMatch={handleAddMatch}
-            participants={currentMatchDay?.participants || []}
-          />
+        <div className="mb-8 flex justify-center gap-4">
+          <button
+            onClick={() => setCurrentPage("dashboard")}
+            className={`rounded-lg border-2 px-8 py-3 font-bold tracking-wider transition-all duration-300 ${
+              currentPage === "dashboard"
+                ? "border-pink-400 bg-pink-500/30 text-pink-300"
+                : "border-cyan-500/30 bg-cyan-900/10 text-cyan-400 hover:border-cyan-400"
+            }`}
+          >
+            🏆 DASHBOARD
+          </button>
+          <button
+            onClick={() => setCurrentPage("players")}
+            className={`rounded-lg border-2 px-8 py-3 font-bold tracking-wider transition-all duration-300 ${
+              currentPage === "players"
+                ? "border-pink-400 bg-pink-500/30 text-pink-300"
+                : "border-cyan-500/30 bg-cyan-900/10 text-cyan-400 hover:border-cyan-400"
+            }`}
+          >
+            👥 PLAYERS
+          </button>
         </div>
 
-        <div className="mb-8">
-          <RecentMatches
-            matches={filteredMatches}
-            onDeleteMatch={handleDeleteMatch}
-          />
-        </div>
+        {currentPage === "dashboard" ? (
+          <>
+            <Dashboard players={players} matches={filteredMatches} />
 
-        <Leaderboard players={players} />
+            <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+              <MatchDayForm
+                onAddMatchDay={handleAddMatchDay}
+                matchDays={matchDays}
+              />
+              <MatchDayList
+                matchDays={matchDays}
+                currentMatchDayId={currentMatchDayId}
+                onSelectMatchDay={handleSelectMatchDay}
+                onDeleteMatchDay={handleDeleteMatchDay}
+              />
+              <MatchForm
+                onAddMatch={handleAddMatch}
+                participants={currentMatchDay?.participants || []}
+              />
+            </div>
+
+            <div className="mb-8">
+              <RecentMatches
+                matches={filteredMatches}
+                onDeleteMatch={handleDeleteMatch}
+              />
+            </div>
+
+            <Leaderboard players={players} />
+          </>
+        ) : (
+          <div className="mb-8">
+            <PlayerManagement />
+          </div>
+        )}
       </div>
 
       <div className="scanline"></div>

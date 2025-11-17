@@ -8,6 +8,13 @@
 4. Copy and paste the following SQL:
 
 ```sql
+-- Create players table
+CREATE TABLE players (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create match_days table
 CREATE TABLE match_days (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -30,16 +37,38 @@ CREATE TABLE matches (
 );
 
 -- Create indexes for better query performance
+CREATE INDEX idx_players_name ON players(name);
 CREATE INDEX idx_matches_match_day_id ON matches(match_day_id);
 CREATE INDEX idx_matches_date ON matches(date DESC);
 CREATE INDEX idx_match_days_date ON match_days(date DESC);
 
 -- Enable Row Level Security (RLS)
+ALTER TABLE players ENABLE ROW LEVEL SECURITY;
 ALTER TABLE match_days ENABLE ROW LEVEL SECURITY;
 ALTER TABLE matches ENABLE ROW LEVEL SECURITY;
 
 -- Create policies to allow public read/write access
 -- (You can make these more restrictive later with authentication)
+CREATE POLICY "Allow public read access on players" 
+  ON players FOR SELECT 
+  TO anon 
+  USING (true);
+
+CREATE POLICY "Allow public insert access on players" 
+  ON players FOR INSERT 
+  TO anon 
+  WITH CHECK (true);
+
+CREATE POLICY "Allow public update access on players" 
+  ON players FOR UPDATE 
+  TO anon 
+  USING (true);
+
+CREATE POLICY "Allow public delete access on players" 
+  ON players FOR DELETE 
+  TO anon 
+  USING (true);
+
 CREATE POLICY "Allow public read access on match_days" 
   ON match_days FOR SELECT 
   TO anon 
@@ -114,10 +143,33 @@ npm run dev
 ## What's Next?
 
 Once you complete these steps, the app will automatically:
-- ✅ Save matches to Supabase
-- ✅ Load matches from Supabase
+- ✅ Save players, matches, and match days to Supabase
+- ✅ Load all data from Supabase
 - ✅ Allow multiple users to see the same data in real-time
 - ✅ Work on GitHub Pages once deployed
+
+## Migrating Existing Players
+
+If you already have the app running and want to migrate the hardcoded players to the database:
+
+1. After completing the setup above, run this SQL in Supabase SQL Editor:
+
+```sql
+-- Insert the original hardcoded players
+INSERT INTO players (name) VALUES
+  ('Michi'),
+  ('Flo'),
+  ('Daggi'),
+  ('Luki'),
+  ('Tommy'),
+  ('Max'),
+  ('Marlene'),
+  ('Jo'),
+  ('Jona')
+ON CONFLICT (name) DO NOTHING;
+```
+
+2. The app will automatically load these players from the database
 
 ## Security Note
 

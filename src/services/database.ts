@@ -3,6 +3,62 @@
 import { supabase } from '../lib/supabase';
 import type { Match, MatchDay } from '../types';
 
+// ==================== Players ====================
+
+export const fetchPlayers = async (): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from('players')
+    .select('name')
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching players:', error);
+    throw error;
+  }
+
+  if (!data) return [];
+
+  return data.map((row: any) => row.name);
+};
+
+export const createPlayer = async (name: string): Promise<void> => {
+  const { error } = await (supabase as any)
+    .from('players')
+    .insert({ name });
+
+  if (error) {
+    console.error('Error creating player:', error);
+    throw error;
+  }
+};
+
+export const deletePlayer = async (name: string): Promise<void> => {
+  const { error } = await supabase
+    .from('players')
+    .delete()
+    .eq('name', name);
+
+  if (error) {
+    console.error('Error deleting player:', error);
+    throw error;
+  }
+};
+
+export const subscribeToPlayers = (callback: () => void) => {
+  const channel = supabase
+    .channel('players_changes')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'players' },
+      callback
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+};
+
 // ==================== Match Days ====================
 
 export const fetchMatchDays = async (): Promise<MatchDay[]> => {

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { MatchDay } from "../types";
-import { FIXED_PLAYERS } from "../constants";
+import { fetchPlayers, subscribeToPlayers } from "../services/database";
 
 interface MatchDayFormProps {
   onAddMatchDay: (participants: string[]) => void;
@@ -11,9 +11,27 @@ export const MatchDayForm = ({
   onAddMatchDay,
   matchDays,
 }: MatchDayFormProps) => {
+  const [players, setPlayers] = useState<string[]>([]);
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
     []
   );
+
+  useEffect(() => {
+    loadPlayers();
+    const unsubscribe = subscribeToPlayers(() => {
+      loadPlayers();
+    });
+    return unsubscribe;
+  }, []);
+
+  const loadPlayers = async () => {
+    try {
+      const data = await fetchPlayers();
+      setPlayers(data);
+    } catch (err) {
+      console.error("Failed to load players:", err);
+    }
+  };
 
   const handleToggleParticipant = (name: string) => {
     if (selectedParticipants.includes(name)) {
@@ -24,7 +42,7 @@ export const MatchDayForm = ({
   };
 
   const handleSelectAll = () => {
-    setSelectedParticipants([...FIXED_PLAYERS]);
+    setSelectedParticipants([...players]);
   };
 
   const handleClearAll = () => {
@@ -79,21 +97,27 @@ export const MatchDayForm = ({
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            {FIXED_PLAYERS.map((player) => (
-              <button
-                key={player}
-                type="button"
-                onClick={() => handleToggleParticipant(player)}
-                className={`rounded-lg border-2 px-4 py-3 font-bold tracking-wide transition-all duration-300 ${
-                  selectedParticipants.includes(player)
-                    ? "scale-105 border-pink-400 bg-pink-500/30 text-pink-300"
-                    : "border-cyan-500/30 bg-cyan-900/10 text-cyan-400 hover:border-cyan-400"
-                }`}
-              >
-                {selectedParticipants.includes(player) && "✓ "}
-                {player}
-              </button>
-            ))}
+            {players.length === 0 ? (
+              <div className="col-span-2 rounded-lg border border-cyan-500/30 bg-cyan-900/10 p-4 text-center text-cyan-400">
+                No players available. Add players in the Player Management section!
+              </div>
+            ) : (
+              players.map((player) => (
+                <button
+                  key={player}
+                  type="button"
+                  onClick={() => handleToggleParticipant(player)}
+                  className={`rounded-lg border-2 px-4 py-3 font-bold tracking-wide transition-all duration-300 ${
+                    selectedParticipants.includes(player)
+                      ? "scale-105 border-pink-400 bg-pink-500/30 text-pink-300"
+                      : "border-cyan-500/30 bg-cyan-900/10 text-cyan-400 hover:border-cyan-400"
+                  }`}
+                >
+                  {selectedParticipants.includes(player) && "✓ "}
+                  {player}
+                </button>
+              ))
+            )}
           </div>
         </div>
 
