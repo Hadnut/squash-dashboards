@@ -78,11 +78,13 @@ export const MatchForm = ({ onAddMatch, participants }: MatchFormProps) => {
               required
             >
               <option value="">Select player...</option>
-              {participants.map((participant) => (
-                <option key={participant} value={participant}>
-                  {participant}
-                </option>
-              ))}
+              {participants
+                .filter((participant) => participant !== player2)
+                .map((participant) => (
+                  <option key={participant} value={participant}>
+                    {participant}
+                  </option>
+                ))}
             </select>
           </div>
           <div>
@@ -113,11 +115,13 @@ export const MatchForm = ({ onAddMatch, participants }: MatchFormProps) => {
               required
             >
               <option value="">Select player...</option>
-              {participants.map((participant) => (
-                <option key={participant} value={participant}>
-                  {participant}
-                </option>
-              ))}
+              {participants
+                .filter((participant) => participant !== player1)
+                .map((participant) => (
+                  <option key={participant} value={participant}>
+                    {participant}
+                  </option>
+                ))}
             </select>
           </div>
           <div>
